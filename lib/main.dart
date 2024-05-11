@@ -17,24 +17,32 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Study Flutter'),
+      home: const CounterPage(title: '计数器应用'),
     );
   }
 }
 
-/// MyHomePage 是一个有状态的小部件，用于显示主页。
-class MyHomePage extends StatefulWidget {
-  /// MyHomePage 构造函数
-  const MyHomePage({required this.title, super.key});
+/// CounterPage 是一个有状态的小部件，用于显示计数器页面。
+class CounterPage extends StatefulWidget {
+  /// CounterPage 构造函数
+  const CounterPage({required this.title, super.key});
 
   /// 标题
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<CounterPage> createState() => _CounterPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _CounterPageState extends State<CounterPage> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,12 +50,22 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: const Center(
-        child: Text('该项目为学习 Flutter 而创建， '
-            '当前的 `main` 分支提供了基本的项目结构。 '
-            '学习内容共有 8 个 `Issue`， '
-            '每个 `Issue` 将会在一个独立分支中进行开发。 '
-            '请切换分支查看所有 `Issue`。'),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text('点击次数:'),
+            Text(
+              '$_counter',
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
       ),
     );
   }
