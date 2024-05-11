@@ -1,5 +1,6 @@
 include: package:very_good_analysis/analysis_options.yaml
 linter:
+<<<<<<< HEAD
 rules:
 always_use_package_imports: false
 prefer_relative_imports: true
@@ -19,3 +20,24 @@ exclude:
 - "**/*.freezed.dart"
 errors:
 invalid_annotation_target: ignore
+=======
+  rules:
+    always_use_package_imports: false
+    prefer_relative_imports: true
+    always_put_required_named_parameters_first: false
+    flutter_style_todos: false
+    public_member_api_docs: false
+    sort_pub_dependencies: false
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  exclude:
+    - lib/generated/**
+    - _flutter/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  errors:
+    invalid_annotation_target: ignore
+>>>>>>> 108045f... feature: add very_good_analysis
