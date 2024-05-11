@@ -85,14 +85,14 @@ class _TodoListPageState extends State<TodoListPage> {
 
   // 显示编辑或添加待办事项的对话框
   void _showDialog(BuildContext context, int? index) {
-    bool isEdit = index != null;
+    final isEdit = index != null;
     if (isEdit) {
       _textController.text = _todos[index];
     } else {
       _textController.clear();
     }
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
