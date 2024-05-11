@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -12,29 +13,70 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Study Flutter',
+      title: '秒表',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Study Flutter'),
+      home: const StopwatchPage(title: '秒表'),
     );
   }
 }
 
-/// MyHomePage 是一个有状态的小部件，用于显示主页。
-class MyHomePage extends StatefulWidget {
-  /// MyHomePage 构造函数
-  const MyHomePage({required this.title, super.key});
+class StopwatchPage extends StatefulWidget {
+  const StopwatchPage({super.key, required this.title});
 
   /// 标题
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<StopwatchPage> createState() => _StopwatchPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _StopwatchPageState extends State<StopwatchPage> {
+  late Stopwatch _stopwatch; // 秒表对象
+  late Duration _currentTime; // 当前时间
+
+  @override
+  void initState() {
+    super.initState();
+    _stopwatch = Stopwatch();
+    _currentTime = const Duration(milliseconds: 0);
+  }
+
+  // 切换开始停止状态
+  void _toggleStopwatch() {
+    setState(() {
+      if (_stopwatch.isRunning) {
+        _stopwatch.stop();
+      } else {
+        _stopwatch.start();
+        _startTimer();
+      }
+    });
+  }
+
+  // 重置
+  void _resetStopwatch() {
+    setState(() {
+      _stopwatch.stop();
+      _stopwatch.reset();
+      _currentTime = const Duration(milliseconds: 0);
+    });
+  }
+
+  // 开始一个定时器来更新当前时间
+  void _startTimer() {
+    Timer.periodic(const Duration(milliseconds: 10), (timer) {
+      if (!_stopwatch.isRunning) {
+        timer.cancel();
+      }
+      setState(() {
+        _currentTime = _stopwatch.elapsed;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,12 +84,30 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: const Center(
-        child: Text('该项目为学习 Flutter 而创建， '
-            '当前的 `main` 分支提供了基本的项目结构。 '
-            '学习内容共有 8 个 `Issue`， '
-            '每个 `Issue` 将会在一个独立分支中进行开发。 '
-            '请切换分支查看所有 `Issue`。'),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              '计时: ${_currentTime.inMinutes}:${(_currentTime.inSeconds % 60).toString().padLeft(2, '0')}:${(_currentTime.inMilliseconds % 1000).toString().padLeft(3, '0')}',
+            ),
+            const SizedBox(height: 20), //间隔
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _toggleStopwatch,
+                  child: Text(_stopwatch.isRunning ? 'Stop' : 'Start'),
+                ),
+                const SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: _resetStopwatch,
+                  child: const Text('Reset'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
