@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: const Text(
-            'This repository is built for learning Flutter, and this branch provides a basic project structure. To view other tasks, please switch the branch.'),
+            '该项目为学习 Flutter 而创建，当前的 `main` 分支提供了基本的项目结构。学习内容共有 8 个 `Issue`，每个 `Issue` 将会在一个独立分支中进行开发。请切换分支查看所有 `Issue`。'),
       ),
     );
   }
