@@ -1,5 +1,14 @@
 import 'dart:convert';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'main.g.dart';
 import 'package:flutter/services.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -12,6 +21,7 @@ part 'main.g.dart';
 void main() {
   runApp(const MyApp());
 }
+
 
 @JsonSerializable()
 class Favorites {
