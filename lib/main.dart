@@ -41,7 +41,7 @@ class _StopwatchPageState extends State<StopwatchPage> {
   void initState() {
     super.initState();
     _stopwatch = Stopwatch();
-    _currentTime = const Duration(milliseconds: 0);
+    _currentTime = Duration.zero;
   }
 
   // 切换开始停止状态
@@ -59,9 +59,10 @@ class _StopwatchPageState extends State<StopwatchPage> {
   // 重置
   void _resetStopwatch() {
     setState(() {
-      _stopwatch.stop();
-      _stopwatch.reset();
-      _currentTime = const Duration(milliseconds: 0);
+      _stopwatch
+        ..stop()
+        ..reset();
+      _currentTime = Duration.zero;
     });
   }
 
@@ -89,7 +90,9 @@ class _StopwatchPageState extends State<StopwatchPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              '计时: ${_currentTime.inMinutes}:${(_currentTime.inSeconds % 60).toString().padLeft(2, '0')}:${(_currentTime.inMilliseconds % 1000).toString().padLeft(3, '0')}',
+              '计时: ${_currentTime.inMinutes}:'
+              '${(_currentTime.inSeconds % 60).toString().padLeft(2, '0')}:'
+              '${(_currentTime.inMilliseconds % 1000).toString().padLeft(3, '0')}',
             ),
             const SizedBox(height: 20), //间隔
             Row(
