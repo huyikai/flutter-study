@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -35,20 +35,22 @@ class RepositorySearchPage extends StatefulWidget {
 // 状态管理
 class _RepositorySearchPageState extends State<RepositorySearchPage> {
   final TextEditingController _controller = TextEditingController();
-  List<dynamic> _searchResults = [];
+  List<Map<String, dynamic>> _searchResults = [];
 
   // 搜索方法
   Future<void> _searchRepositories() async {
     final response = await http.get(
       Uri.parse(
-          'https://api.github.com/search/repositories?q=${_controller.text}'),
+        'https://api.github.com/search/repositories?q=${_controller.text}',
+      ),
       headers: {'Accept': 'application/vnd.github.v3+json'},
     );
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      final data = json.decode(response.body) as Map<String, dynamic>;
       setState(() {
-        _searchResults = data['items'];
+        _searchResults =
+            List<Map<String, dynamic>>.from(data['items'] as List<dynamic>);
       });
     } else {
       throw Exception('Failed to load repository data');
@@ -64,7 +66,7 @@ class _RepositorySearchPageState extends State<RepositorySearchPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: TextField(
               controller: _controller,
               decoration: const InputDecoration(
@@ -79,16 +81,20 @@ class _RepositorySearchPageState extends State<RepositorySearchPage> {
               itemCount: _searchResults.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(_searchResults[index]['name'],
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(
+                    _searchResults[index]['name'].toString(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(
-                      _searchResults[index]['description'] ?? 'No description'),
+                    _searchResults[index]['description'].toString(),
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      MaterialPageRoute<RepositoryDetailPage>(
                         builder: (context) => RepositoryDetailPage(
-                            repository: _searchResults[index]),
+                          repository: _searchResults[index],
+                        ),
                       ),
                     );
                   },
@@ -104,42 +110,56 @@ class _RepositorySearchPageState extends State<RepositorySearchPage> {
 
 // 仓库详细信息页面的无状态组件
 class RepositoryDetailPage extends StatelessWidget {
-  final Map<String, dynamic> repository;
+  const RepositoryDetailPage({
+    required this.repository,
+    super.key,
+  });
 
-  const RepositoryDetailPage({super.key, required this.repository});
+  final Map<String, dynamic> repository;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(repository['name']),
+        title: Text(repository['name'].toString()),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('仓库名: ${repository['full_name']}',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge!
-                    .copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Text('Stars: ${repository['stargazers_count']}',
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 10),
-            Text('Forks: ${repository['forks_count']}',
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 10),
-            Text('Open Issues: ${repository['open_issues_count']}',
-                style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              '仓库名: ${repository['full_name']}',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge!
+                  .copyWith(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
             Text(
-                'Description: ${repository['description'] ?? 'No description available.'}',
-                style: Theme.of(context).textTheme.bodyLarge),
+              'Stars: ${repository['stargazers_count']}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 10),
-            Text('Repository URL: ${repository['html_url']}',
-                style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Forks: ${repository['forks_count']}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Open Issues: ${repository['open_issues_count']}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Description: ${repository['description']}',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Repository URL: ${repository['html_url']}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           ],
         ),
       ),
