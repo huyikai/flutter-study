@@ -22,10 +22,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// CounterPage 是一个有状态的小部件，用于显示计数器页面。
 class CounterPage extends StatefulWidget {
-  /// CounterPage 构造函数
-  const CounterPage({required this.title, super.key});
+  const CounterPage({super.key, required this.title});
 
   /// 标题
   final String title;
