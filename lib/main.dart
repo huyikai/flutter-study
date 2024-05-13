@@ -55,20 +55,20 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () => scanISBN(),
+              onPressed: scanISBN,
               child: const Text('扫描条形码'),
             ),
             const SizedBox(height: 20),
-            // 显示 Amazon 产品页面
-            _isbn.isNotEmpty
-                ? Expanded(
-                    child: WebView(
-                      initialUrl:
-                          'https://www.amazon.co.jp/dp/${convertISBN13toISBN10(_isbn)}',
-                      javascriptMode: JavascriptMode.unrestricted,
-                    ),
-                  )
-                : const Text('请扫描一本书的条形码以显示其 Amazon 产品页面。')
+            if (_isbn.isNotEmpty)
+              Expanded(
+                child: WebView(
+                  initialUrl:
+                      'https://www.amazon.co.jp/dp/${convertISBN13toISBN10(_isbn)}',
+                  javascriptMode: JavascriptMode.unrestricted,
+                ),
+              ),
+            if (_isbn.isEmpty) // 可以添加一个 else 条件
+              const Text('请扫描一本书的条形码以显示其 Amazon 产品页面。'),
           ],
         ),
       ),
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 扫描 ISBN-13
   Future<void> scanISBN() async {
-    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+    final barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
         '#ff6666', 'Cancel', true, ScanMode.BARCODE);
     if (!mounted) return;
 
@@ -89,14 +89,14 @@ class _MyHomePageState extends State<MyHomePage> {
   // 转换 ISBN-13 为 ISBN-10
   String convertISBN13toISBN10(String isbn13) {
     if (isbn13.length == 13 && isbn13.startsWith('978')) {
-      String isbn10 = isbn13.substring(3, 12);
-      int sum = 0;
-      for (int i = 0; i < 9; i++) {
+      final isbn10 = isbn13.substring(3, 12);
+      var sum = 0;
+      for (var i = 0; i < 9; i++) {
         sum += int.parse(isbn10[i]) * (10 - i);
       }
-      int check = 11 - (sum % 11);
-      isbn10 += check == 10 ? 'X' : (check == 11 ? '0' : check.toString());
-      return isbn10;
+      final check = 11 - (sum % 11);
+      return isbn10 +
+          (check == 10 ? 'X' : (check == 11 ? '0' : check.toString()));
     }
     return isbn13; // 不可转换，返回原值
   }
