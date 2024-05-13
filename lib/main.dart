@@ -1,20 +1,11 @@
 import 'dart:convert';
-import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-part 'main.g.dart';
-import 'package:flutter/services.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:universal_html/html.dart' as html;
 
 part 'main.g.dart';
 
@@ -22,18 +13,14 @@ void main() {
   runApp(const MyApp());
 }
 
-
 @JsonSerializable()
 class Favorites {
-  List<String> titles;
-
   Favorites({required this.titles});
-
   factory Favorites.fromJson(Map<String, dynamic> json) =>
       _$FavoritesFromJson(json);
+  List<String> titles;
   Map<String, dynamic> toJson() => _$FavoritesToJson(this);
 }
-
 
 /// MyApp 是一个无状态的小部件，用于初始化应用程序的根。
 class MyApp extends StatelessWidget {
@@ -84,10 +71,10 @@ class _NewsPageState extends State<NewsPage> {
   // 异步加载新闻数据
   Future<void> _loadNews() async {
     await Future.delayed(const Duration(seconds: 1));
-    final String response = await rootBundle.loadString('assets/news.json');
-    final data = await json.decode(response);
+    final response = await rootBundle.loadString('assets/news.json');
+    final data = await json.decode(response) as Map<String, dynamic>;
     setState(() {
-      _news = data['articles'];
+      _news = List<dynamic>.from(data['articles'] as List<dynamic>);
     });
   }
 
@@ -107,17 +94,18 @@ class _NewsPageState extends State<NewsPage> {
   // 加载收藏列表
   Future<List<String>> loadFavorites() async {
     if (kIsWeb) {
-      String? favoritesStr = html.window.localStorage['favorites'];
+      final favoritesStr = html.window.localStorage['favorites'];
       if (favoritesStr != null) {
-        return List<String>.from(json.decode(favoritesStr));
+        return List<String>.from(json.decode(favoritesStr) as List<String>);
       }
       return [];
     } else {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/favorites.json');
-      if (await file.exists()) {
-        String contents = await file.readAsString();
-        final favoritesModel = Favorites.fromJson(json.decode(contents));
+      if (file.existsSync()) {
+        final contents = await file.readAsString();
+        final favoritesModel =
+            Favorites.fromJson(json.decode(contents) as Map<String, dynamic>);
         return favoritesModel.titles;
       }
       return [];
@@ -146,7 +134,7 @@ class _NewsPageState extends State<NewsPage> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadNews,
-          )
+          ),
         ],
       ),
       body: _news.isEmpty
@@ -154,19 +142,22 @@ class _NewsPageState extends State<NewsPage> {
           : ListView.separated(
               itemCount: _news.length,
               itemBuilder: (context, index) {
-                final article = _news[index];
+                final article = _news[index] as Map<String, dynamic>;
                 final isFavorite = _favorites.contains(article['title']);
                 return ListTile(
-                  title: Text(article['title'],
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(
+                    article['title'].toString(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(
-                    article['description'],
+                    article['description'].toString(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   trailing: IconButton(
                     icon: Icon(isFavorite ? Icons.star : Icons.star_border),
-                    onPressed: () => _toggleFavorite(article['title']),
+                    onPressed: () =>
+                        _toggleFavorite(article['title'].toString()),
                   ),
                 );
               },
