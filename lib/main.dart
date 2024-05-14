@@ -175,8 +175,10 @@ class _NewsPageState extends State<NewsPage> {
             _isLoading = true;
           });
           _loadNews().then((_) {
-            setState(() {
-              _isLoading = false;
+            Future.delayed(const Duration(seconds: 1), () {
+              setState(() {
+                _isLoading = false;
+              });
             });
           });
         },
