@@ -70,11 +70,12 @@ class _NewsPageState extends State<NewsPage> {
 
   // 异步加载新闻数据
   Future<void> _loadNews() async {
-    await Future.delayed(const Duration(seconds: 1));
-    final response = await rootBundle.loadString('assets/news.json');
-    final data = await json.decode(response) as Map<String, dynamic>;
-    setState(() {
-      _news = List<dynamic>.from(data['articles'] as List<dynamic>);
+    Future.delayed(const Duration(seconds: 1), () async {
+      final response = await rootBundle.loadString('assets/news.json');
+      final data = await json.decode(response) as Map<String, dynamic>;
+      setState(() {
+        _news = List<dynamic>.from(data['articles'] as List<dynamic>);
+      });
     });
   }
 
@@ -96,7 +97,12 @@ class _NewsPageState extends State<NewsPage> {
     if (kIsWeb) {
       final favoritesStr = html.window.localStorage['favorites'];
       if (favoritesStr != null) {
-        return List<String>.from(json.decode(favoritesStr) as List<String>);
+        try {
+          final decodedList = json.decode(favoritesStr) as List<dynamic>;
+          return List<String>.from(decodedList);
+        } catch (e) {
+          return [];
+        }
       }
       return [];
     } else {
